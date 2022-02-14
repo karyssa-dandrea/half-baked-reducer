@@ -1,31 +1,12 @@
-import { useEffect, useState, useReducer } from 'react'
+import { useState, useReducer } from 'react'
 
 const pinkRGB = `rgb(236, 72, 153)`
-// const initialState = { count: 0 }
-
-function countersReducer(count, action) {
-  switch (action.type) {
-    case 'incremented': {
-      return count + 1
-    }
-    case 'decremented': {
-      return count - 1
-    }
-    case 'reset': {
-      return 0
-    }
-    default: {
-      throw Error(`Unknown action: ${action.type}`)
-    }
-  }
-}
+const initialState = { count: 0, color: pinkRGB }
 
 export default function Counter() {
-  // const [count, setCount] = useState(0)
   const [currentColor, setCurrentColor] = useState(pinkRGB)
-  const [count, dispatch] = useReducer(countersReducer, 0)
 
-  useEffect(() => {
+  function getColor(count) {
     if (count === 0) {
       setCurrentColor(pinkRGB)
     }
@@ -37,7 +18,28 @@ export default function Counter() {
     if (count < 0) {
       setCurrentColor(`rgb(239, 68, 68)`)
     }
-  }, [count])
+
+    return pinkRGB
+  }
+
+  function countersReducer(state, action) {
+    switch (action.type) {
+      case 'incremented':
+        return { ...state, count: state.count + 1, color: getColor(state.count + 1) }
+
+      case 'decremented':
+        return { ...state, count: state.count - 1, color: getColor(state.count - 1) }
+
+      case 'reset':
+        return { ...state, count: 0, color: getColor(0) }
+
+      default: {
+        throw Error(`Unknown action: ${action.type}`)
+      }
+    }
+  }
+
+  const [state, dispatch] = useReducer(countersReducer, initialState)
 
   const increment = () => {
     dispatch({
@@ -60,7 +62,7 @@ export default function Counter() {
   return (
     <main className="bg-black bg-opacity-90 min-h-screen flex flex-col items-center justify-center text-4xl text-pink-500">
       <h1 className="mb-5" style={{ color: currentColor }}>
-        {count}
+        {state.count}
       </h1>
       <div className="flex w-1/2 justify-around">
         <button
